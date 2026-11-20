@@ -15,7 +15,7 @@ namespace projekt
                 for (int j = 0; j < matrix.GetLength(1); j++)
                 {
                     int ellenseg = Random.Shared.Next(0, 2);
-                    if (ellenseg == 1)
+                    if (ellenseg == 1 & i < 3)
                     {
                         matrix[i, j] = 'x';
                     }
@@ -70,7 +70,7 @@ namespace projekt
                     else if (gomb.Key == ConsoleKey.UpArrow)
                     {
                         // Itt indíthattok el egy új lövedéket az aktuális oszlopból
-
+                        matrix[matrix.GetLength(0) - 1, jatekosOszlop] = '|';
                     }
                     else if (gomb.Key == ConsoleKey.Escape)
                     {
