@@ -1,10 +1,199 @@
-﻿namespace projekt
+﻿using System.Diagnostics;
+using System.Numerics;
+
+namespace projekt
 {
     internal class Program
     {
+        static char[] HajoPozicio = new char[30];
+        static char[,] matrix = new char[20, 30];
+
+        static void Feltoltes()
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    int ellenseg = Random.Shared.Next(0, 2);
+                    if (ellenseg == 1)
+                    {
+                        matrix[i, j] = 'x';
+                    }
+                    else
+                    {
+                        matrix[i, j] = ' ';
+                    }
+                }
+            }
+        }
+        static void Kiir()
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                Console.Write("\t\t");
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    Console.Write($" {matrix[i, j]} ");
+                }
+                Console.WriteLine();
+            }
+        }
+        static void Jatek()
+        {
+            int sorok = matrix.GetLength(0);
+            int oszlopok = matrix.GetLength(1);
+            int jatekosOszlop = oszlopok / 2;
+
+            bool jatekFut = true;
+
+            Stopwatch ora = Stopwatch.StartNew();
+            Console.CursorVisible = false;
+
+
+            while (jatekFut)
+            {
+                long most = ora.ElapsedMilliseconds;
+
+
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo gomb = Console.ReadKey(true);
+                    if (gomb.Key == ConsoleKey.LeftArrow && jatekosOszlop > 0)
+
+                    {
+                        jatekosOszlop--;
+                    }
+                    else if (gomb.Key == ConsoleKey.RightArrow && jatekosOszlop < oszlopok - 1)
+                    {
+                        jatekosOszlop++;
+                    }
+                    else if (gomb.Key == ConsoleKey.UpArrow)
+                    {
+                        // Itt indíthattok el egy új lövedéket az aktuális oszlopból
+
+                    }
+                    else if (gomb.Key == ConsoleKey.Escape)
+                    {
+                        jatekFut = false;
+                    }
+                }
+                Console.SetCursorPosition(0, 0);
+
+                Kiir();
+
+                // Játékos sorának kirajzolása alulra
+                Console.Write("\t\t");
+                for (int o = 0; o < oszlopok; o++)
+                {
+                    if (o == jatekosOszlop)
+                        Console.Write(" A ");
+                    else
+                        Console.Write("   ");
+                }
+                Console.WriteLine();
+            }
+        }
+        static void Pelda()
+        {
+            const int sorok = 20;
+            const int oszlopok = 40;
+
+            char[,] palya = new char[sorok, oszlopok];
+            char[] jatekosSor = new char[oszlopok];
+
+            // Játékos kezdeti pozíciója középen
+            int jatekosOszlop = oszlopok / 2;
+
+            Stopwatch ora = Stopwatch.StartNew();
+            long utolsoEllensegMozgás = 0;
+            long utolsoLovedekMozgás = 0;
+
+            const int ellensegKozMs = 500; // 0.5 mp-ként lép az ellenség
+            const int lovedekKozMs = 150;  // Gyorsabb lövedék mozgás
+
+            Console.CursorVisible = false;
+
+            bool jatekFut = true;
+            while (jatekFut)
+            {
+                long most = ora.ElapsedMilliseconds;
+
+                // 1. Nem blokkoló billentyűzetkezelés
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo gomb = Console.ReadKey(true);
+                    if (gomb.Key == ConsoleKey.LeftArrow && jatekosOszlop > 0)
+                    {
+                        jatekosOszlop--;
+                    }
+                    else if (gomb.Key == ConsoleKey.RightArrow && jatekosOszlop < oszlopok - 1)
+                    {
+                        jatekosOszlop++;
+                    }
+                    else if (gomb.Key == ConsoleKey.UpArrow)
+                    {
+                        // Itt indíthattok el egy új lövedéket az aktuális oszlopból
+
+                    }
+                    else if (gomb.Key == ConsoleKey.Escape)
+                    {
+                        jatekFut = false;
+                    }
+                }
+
+                // 2. Ellenségek léptetése időzítővel
+                if (most - utolsoEllensegMozgás >= ellensegKozMs)
+                {
+                    // TODO: Ellenségek lefelé mozgatása a mátrixban
+                    utolsoEllensegMozgás = most;
+                }
+
+                // 3. Lövedékek léptetése időzítővel
+                if (most - utolsoLovedekMozgás >= lovedekKozMs)
+                {
+                    // TODO: Lövedékek felfelé mozgatása és ütközésvizsgálat
+                    utolsoLovedekMozgás = most;
+                }
+
+                // 4. Kirajzolás (Kurzor vissza a sarokba)
+                Console.SetCursorPosition(0, 0);
+
+                for (int s = 0; s < sorok; s++)
+                {
+                    for (int o = 0; o < oszlopok; o++)
+                    {
+                        // Ha üres a mező, írjunk ki szóközt vagy alap karaktert
+                        Console.Write(palya[s, o] == '\0' ? ' ' : palya[s, o]);
+                    }
+                    Console.WriteLine();
+                }
+
+                // Játékos sorának kirajzolása alulra
+                for (int o = 0; o < oszlopok; o++)
+                {
+                    if (o == jatekosOszlop)
+                        Console.Write('A');
+                    else
+                        Console.Write(' ');
+                }
+                Console.WriteLine();
+
+                // Kis szünet, hogy ne terhelje túl a CPU-t
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Feltoltes();
+            //Kiir();
+            Jatek();
+            //string hajo = "    /\\\n  |<==>|";
+            //SajatUrhajo();
+            //Pelda();
+            //Jatek();
         }
     }
 }
+
