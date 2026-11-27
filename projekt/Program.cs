@@ -15,7 +15,7 @@ namespace projekt
         static int jatekosX = 14;
         static int jatekosY = 18;
         static int pont = 0;
-        static int elet = 3;
+        static int timer = 6000;
         static int  Irany = 1;
         static bool jatekVege = false;
         static bool gyozelem = false;
@@ -39,6 +39,7 @@ namespace projekt
                 enemies[0, i] = true;
                 enemies[1, i] = true;
                 enemies[2, i] = true;
+                enemies[3, i] = true;
             }
             modosit();
         }
@@ -48,8 +49,10 @@ namespace projekt
             Stopwatch ora = Stopwatch.StartNew();
             long utolsoGyorsEsemeny = 0;
             long utolsoLassuEsemeny = 0;
-            const int gyorsKozMs = 100;
-            const int lassuKozMs = 500;
+            long utolsoLassuEsemeny2 = 0;
+            const int gyorsKozMs = 200;
+            const int lassuKozMs = 3000;
+            const int lassuKozMs2 = 1000;
             while (!jatekVege)
             {
                 long most = ora.ElapsedMilliseconds;
@@ -84,6 +87,13 @@ namespace projekt
                 {
                     EllensegMozgas();
                     utolsoLassuEsemeny = most;
+
+                }
+                if (most - utolsoLassuEsemeny2 >= lassuKozMs2)
+                {
+                    timer--;
+                    utolsoLassuEsemeny2 = most;
+
                 }
                 Thread.Sleep(5);
             }
@@ -98,6 +108,7 @@ namespace projekt
             }
             Console.WriteLine("Your score: " + pont);
             Console.WriteLine("Press any key to exit...");
+
             Console.ReadKey(true);
         }
         static void modosit()
@@ -167,6 +178,10 @@ namespace projekt
                 gyozelem = true;
                 jatekVege = true;
             }
+            if (timer <= 0)
+            {
+                jatekVege = true;
+            }
         }
         static void EllensegMozgas()
         {
@@ -217,7 +232,7 @@ namespace projekt
         static void Kirajzolas()
         {
             Console.SetCursorPosition(0, 0);
-            Console.WriteLine("SCORE: " + pont + "     LIVES: " + elet + "       ");
+            Console.WriteLine("SCORE: " + pont + "\t" + "Time: " + timer);
             Console.WriteLine("-----------------------------------------------");
             for (int i = 0; i < matrix.GetLength(0); i++)
             {
@@ -234,6 +249,7 @@ namespace projekt
             Start();
             Feltoltes();
             Jatek();
+            
             Console.CursorVisible = true;
         }
     }
