@@ -1,129 +1,256 @@
-﻿using System.Diagnostics;
 
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading;
 namespace projekt
 {
     internal class Program
     {
         static string[,] matrix = new string[20, 30];
+        static bool[,] enemies = new bool[20, 30];
+        static List<int[]> bullets = new List<int[]>();
         static Random re = new Random();
         static int maxSor = 0;
+        static int jatekosX = 14;
+        static int jatekosY = 18;
+        static int pont = 0;
+        static int timer = 6000;
+        static int  Irany = 1;
+        static bool jatekVege = false;
+        static bool gyozelem = false;
         static void Start()
         {
             Console.WriteLine("------------Welcome to Space Invaders!------------");
             Console.WriteLine("Press any key to start the game...");
-            Console.ReadKey();
+            Console.ReadKey(true);
         }
         static void Feltoltes()
         {
-            for (int i = 2; i < matrix.GetLength(1); i+=3)
+            for (int i = 0; i < matrix.GetLength(0); i++)
             {
-                matrix[0, i] = "<X>";
-
-            }
-            for(int i = 0; i < matrix.GetLength(0); i++)
-            {
-                for(int j = 0; j < matrix.GetLength(1); j++)
+                for (int j = 0; j < matrix.GetLength(1); j++)
                 {
-                    if (matrix[i, j] == null)
-                    {
-                        matrix[i, j] = "   ";
-                    }
+                    matrix[i, j] = "   ";
                 }
             }
+            for (int i = 2; i < matrix.GetLength(1) - 2; i += 4)
+            {
+                enemies[0, i] = true;
+                enemies[1, i] = true;
+                enemies[2, i] = true;
+                enemies[3, i] = true;
+            }
+            modosit();
         }
-
         static void Jatek()
         {
-            string Sajathajo = "👾";
-            string ellenseghajo = "<X>";
             Console.Clear();
-            Console.WriteLine("Game started!");
-            // Game logic goes here
             Stopwatch ora = Stopwatch.StartNew();
-
-
             long utolsoGyorsEsemeny = 0;
-
             long utolsoLassuEsemeny = 0;
-
-
-            const int gyorsKozMs = 1000;
-            const int lassuKozMs = 1000;
-            
-
-            while (ora.ElapsedMilliseconds < 100000)
-
+            long utolsoLassuEsemeny2 = 0;
+            const int gyorsKozMs = 200;
+            const int lassuKozMs = 3000;
+            const int lassuKozMs2 = 1000;
+            while (!jatekVege)
             {
-
                 long most = ora.ElapsedMilliseconds;
-                
-
+               
+                while (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo billentyu = Console.ReadKey(true);
+                    if (billentyu.Key == ConsoleKey.LeftArrow)
+                    {
+                        if (jatekosX > 0)
+                            jatekosX--;
+                    }
+                    if (billentyu.Key == ConsoleKey.RightArrow)
+                    {
+                        if (jatekosX < matrix.GetLength(1) - 1)
+                            jatekosX++;
+                    }
+                    if (billentyu.Key == ConsoleKey.Spacebar)
+                    {
+                        loves();
+                    }
+                }
+               
                 if (most - utolsoGyorsEsemeny >= gyorsKozMs)
                 {
-                    Console.Clear();
+                    GolyoMozgas();
                     modosit();
-                    for (int i = 0; i < matrix.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < matrix.GetLength(1); j++)
-                        {
-                            Console.Write(matrix[i, j]);
-                            
-                        }
-                        Console.WriteLine();
-                    }
-                    maxSor += 1;
-                    
+                    Kirajzolas();
                     utolsoGyorsEsemeny = most;
                 }
                 if (most - utolsoLassuEsemeny >= lassuKozMs)
                 {
-                    Console.Write("");
-
+                    EllensegMozgas();
                     utolsoLassuEsemeny = most;
 
                 }
-            }
-            }
-
-        private static void modosit()
-        {
-            if (maxSor <= 4)
-            {
-                for (int i = 2; i < matrix.GetLength(1); i += 3)
+                if (most - utolsoLassuEsemeny2 >= lassuKozMs2)
                 {
-                    matrix[0, i] = "<X>";
+                    timer--;
+                    utolsoLassuEsemeny2 = most;
 
                 }
-                for (int i = 0; i < matrix.GetLength(0); i++)
+                Thread.Sleep(5);
+            }
+            Console.Clear();
+            if (gyozelem)
+            {
+                Console.WriteLine("YOU WIN!");
+            }
+            else
+            {
+                Console.WriteLine("GAME OVER!");
+            }
+            Console.WriteLine("Your score: " + pont);
+            Console.WriteLine("Press any key to exit...");
+
+            Console.ReadKey(true);
+        }
+        static void modosit()
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
                 {
-                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    matrix[i, j] = "   ";
+                }
+            }
+            for (int i = 0; i < enemies.GetLength(0); i++)
+            {
+                for (int j = 0; j < enemies.GetLength(1); j++)
+                {
+                    if (enemies[i, j])
                     {
-                        if (matrix[i, j] == null)
+                        matrix[i, j] = "<X>";
+                    }
+                }
+            }
+            foreach (int[] golyo in bullets)
+            {
+                matrix[golyo[1], golyo[0]] = " | ";
+            }
+            matrix[jatekosY, jatekosX] = " A ";
+        }
+        static void loves()
+        {
+            if (jatekosY > 0)
+            {
+                bullets.Add(new int[] { jatekosX, jatekosY - 1 });
+            }
+        }
+        static void GolyoMozgas()
+        {
+            for (int i = bullets.Count - 1; i >= 0; i--)
+            {
+                int x = bullets[i][0];
+                int y = bullets[i][1];
+                y--;
+                if (y < 0)
+                {
+                    bullets.RemoveAt(i);
+                    continue;
+                }
+                if (enemies[y, x])
+                {
+                    enemies[y, x] = false;
+                    bullets.RemoveAt(i);
+                    pont += 10;
+                    continue;
+                }
+                bullets[i][1] = y;
+            }
+            int ellensegek = 0;
+            for (int i = 0; i < enemies.GetLength(0); i++)
+            {
+                for (int j = 0; j < enemies.GetLength(1); j++)
+                {
+                    if (enemies[i, j])
+                        ellensegek++;
+                }
+            }
+            if (ellensegek == 0)
+            {
+                gyozelem = true;
+                jatekVege = true;
+            }
+            if (timer <= 0)
+            {
+                jatekVege = true;
+            }
+        }
+        static void EllensegMozgas()
+        {
+            bool szel = false;
+            for (int i = 0; i < enemies.GetLength(0); i++)
+            {
+                for (int j = 0; j < enemies.GetLength(1); j++)
+                {
+                    if (enemies[i, j])
+                    {
+                        if (j + Irany < 0 ||
+                            j + Irany >= enemies.GetLength(1))
                         {
-                            matrix[i, j] = "   ";
+                            szel = true;
                         }
                     }
                 }
             }
-            
-            for (int i = matrix.GetLength(0) -2; i >= 0; i--)
+            if (szel)
             {
-                for(int j = 0; j < matrix.GetLength(1); j++)
+                Irany *= -1;
+            }
+            bool[,] ujEnemies = new bool[20, 30];
+            for (int i = 0; i < enemies.GetLength(0); i++)
+            {
+                for (int j = 0; j < enemies.GetLength(1); j++)
                 {
-                    if (matrix[i, j] == "<X>")
+                    if (enemies[i, j])
                     {
-                        matrix[i+1, j] = "<X>";
-                        matrix[i, j] = " ";
+                        int ujX = j + Irany;
+                        int ujY = i;
+                        if (szel)
+                        {
+                            ujY++;
+                        }
+                        // Ha az ellenseg eleri a jatekost
+                        if (ujY >= jatekosY)
+                        {
+                            jatekVege = true;
+                            continue;
+                        }
+                        ujEnemies[ujY, ujX] = true;
                     }
                 }
             }
+            enemies = ujEnemies;
         }
-
+        static void Kirajzolas()
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine("SCORE: " + pont + "\t" + "Time: " + timer);
+            Console.WriteLine("-----------------------------------------------");
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    Console.Write(matrix[i, j]);
+                }
+                Console.WriteLine();
+            }
+        }
         static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             Start();
             Feltoltes();
             Jatek();
+            
+            Console.CursorVisible = true;
         }
     }
 }
