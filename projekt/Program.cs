@@ -10,8 +10,6 @@ namespace projekt
         static string[,] matrix = new string[20, 30];
         static bool[,] enemies = new bool[20, 30];
         static List<int[]> bullets = new List<int[]>();
-        // static Random re = new Random(); viccbõl
-        //static int maxSor = 0;
         static int jatekosX = 14;
         static int jatekosY = 18;
         static string performance = "";
