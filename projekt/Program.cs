@@ -16,6 +16,8 @@ namespace projekt
         static int pont = 0;
         static int timer = 100;
         static int  Irany = 1;
+        static int level = 1;
+        static int lassuKozMs = 1000;
         static double multiplier = 0;
         static bool jatekVege = false;
         static bool gyozelem = false;
@@ -52,7 +54,7 @@ namespace projekt
             long utolsoLassuEsemeny = 0;
             long utolsoLassuEsemeny2 = 0;
             const int gyorsKozMs = 200;
-            const int lassuKozMs = 400;
+            
             const int lassuKozMs2 = 1000;
             while (!jatekVege)
             {
@@ -98,19 +100,55 @@ namespace projekt
                 }
                 Thread.Sleep(5);
             }
+            Multiplier();
             Console.Clear();
             if (gyozelem)
             {
-                Console.WriteLine("YOU WIN!");
+                Console.WriteLine($"YOU WON LEVEL {level}!");
+                Console.WriteLine("Press R key to go to the next level");
+
+                ConsoleKeyInfo ujrakezdes = Console.ReadKey(true);
+                if (ujrakezdes.Key == ConsoleKey.R)
+                {
+                    lassuKozMs -= 200;
+                    level++;
+                    jatekVege = false;
+                    gyozelem = false;
+                    Console.WriteLine($"------------Level {level}------------");
+                    Console.WriteLine("Space: Shoot \nRight: RightArrow \nLeft: LeftArrow");
+                    Console.WriteLine("Press any key to continue the game...");
+                    Console.ReadKey(true);
+                    Feltoltes();
+                    Jatek();
+                }
+                else
+                {
+                    Console.WriteLine("Vége");
+                    jatekVege = true;
+                }
             }
             else
             {
                 Console.WriteLine("GAME OVER!");
-            }
-            Console.WriteLine("Your score: " + pont*multiplier + "\n" + performance);
-            Console.WriteLine("Press any key to exit...");
+                ConsoleKeyInfo ujrakezdes1 = Console.ReadKey(true);
+                if (ujrakezdes1.Key == ConsoleKey.R)
+                {
+                    Start();
+                    Feltoltes();
+                    Jatek();
+                }
+                else
+                {
+                    Console.WriteLine("Vége");
+                    jatekVege = true;
+                }
 
-            Console.ReadKey(true);
+
+            }
+            Console.WriteLine("Timer: " + timer + "\n" + "Your score: " + pont*multiplier + "\n" + performance);
+            
+
+
         }
         static void modosit()
         {
@@ -219,8 +257,7 @@ namespace projekt
                         {
                             ujY++;
                         }
-                        // Ha az ellenseg eleri a jatekost
-                        if (ujY >= jatekosY)
+                         if (ujY >= jatekosY)
                         {
                             jatekVege = true;
                             continue;
@@ -259,17 +296,17 @@ namespace projekt
                 multiplier = 3;
                 performance = "Amazing!";
             }
-            else if (timer > 90 && timer <= 120)
+            else if (timer <= 100)
             {
                 multiplier = 4;
                 performance = "Wonderful!";
             }
-            else if (timer > 120 && timer <= 150)
+            else if (timer > 100 && timer <= 110)
             {
                 multiplier = 5;
                 performance = "Rampage!!";
             }
-            else if (timer > 150)
+            else
             {
                 multiplier = 7;
                 performance = "Ultrakill!!!";
@@ -279,7 +316,7 @@ namespace projekt
         static void Kirajzolas()
             {
             Console.SetCursorPosition(0, 0);
-            Console.WriteLine($"SCORE:  {pont}\tTime:   {timer}");
+            Console.WriteLine($"SCORE:  {pont}\tTime:   {timer}\tLevel {level}");
             Console.WriteLine("-----------------------------------------------");
             for (int i = 0; i < matrix.GetLength(0); i++)
             {
@@ -295,9 +332,10 @@ namespace projekt
             Console.CursorVisible = false;
             Start();
             Feltoltes();
-            Multiplier();
             Jatek();
             
+
+
             Console.CursorVisible = true;
         }
     }
