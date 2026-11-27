@@ -10,18 +10,21 @@ namespace projekt
         static string[,] matrix = new string[20, 30];
         static bool[,] enemies = new bool[20, 30];
         static List<int[]> bullets = new List<int[]>();
-        static Random re = new Random();
-        static int maxSor = 0;
+        // static Random re = new Random(); viccbõl
+        //static int maxSor = 0;
         static int jatekosX = 14;
         static int jatekosY = 18;
+        static string performance = "";
         static int pont = 0;
-        static int timer = 6000;
+        static int timer = 100;
         static int  Irany = 1;
+        static double multiplier = 0;
         static bool jatekVege = false;
         static bool gyozelem = false;
         static void Start()
         {
             Console.WriteLine("------------Welcome to Space Invaders!------------");
+            Console.WriteLine("Space: Shoot \nRight: RightArrow \nLeft: LeftArrow");
             Console.WriteLine("Press any key to start the game...");
             Console.ReadKey(true);
         }
@@ -51,7 +54,7 @@ namespace projekt
             long utolsoLassuEsemeny = 0;
             long utolsoLassuEsemeny2 = 0;
             const int gyorsKozMs = 200;
-            const int lassuKozMs = 3000;
+            const int lassuKozMs = 400;
             const int lassuKozMs2 = 1000;
             while (!jatekVege)
             {
@@ -91,7 +94,7 @@ namespace projekt
                 }
                 if (most - utolsoLassuEsemeny2 >= lassuKozMs2)
                 {
-                    timer--;
+                    timer -= 1;
                     utolsoLassuEsemeny2 = most;
 
                 }
@@ -106,7 +109,7 @@ namespace projekt
             {
                 Console.WriteLine("GAME OVER!");
             }
-            Console.WriteLine("Your score: " + pont);
+            Console.WriteLine("Your score: " + pont*multiplier + "\n" + performance);
             Console.WriteLine("Press any key to exit...");
 
             Console.ReadKey(true);
@@ -160,6 +163,7 @@ namespace projekt
                     enemies[y, x] = false;
                     bullets.RemoveAt(i);
                     pont += 10;
+                    timer += 2;
                     continue;
                 }
                 bullets[i][1] = y;
@@ -229,10 +233,55 @@ namespace projekt
             }
             enemies = ujEnemies;
         }
-        static void Kirajzolas()
+        static void Multiplier()
         {
+            if (timer <= 20)
+            {
+                multiplier = 0.75;
+                performance = "Too bad Loser, try again";
+            }
+            else if (timer <= 30)
+            {
+                multiplier = 1.2;
+                performance = "OK";
+            }
+            else if (timer <= 50)
+            {
+                multiplier = 1.5;
+                performance = "Good";
+
+            }
+            else if (timer <= 70)
+            {
+                multiplier = 2;
+                performance = "Great!";
+            }
+            else if (timer <= 90)
+            {
+                multiplier = 3;
+                performance = "Amazing!";
+            }
+            else if (timer > 90 && timer <= 120)
+            {
+                multiplier = 4;
+                performance = "Wonderful!";
+            }
+            else if (timer > 120 && timer <= 150)
+            {
+                multiplier = 5;
+                performance = "Rampage!!";
+            }
+            else if (timer > 150)
+            {
+                multiplier = 7;
+                performance = "Ultrakill!!!";
+            }
+        }
+
+        static void Kirajzolas()
+            {
             Console.SetCursorPosition(0, 0);
-            Console.WriteLine("SCORE: " + pont + "\t" + "Time: " + timer);
+            Console.WriteLine($"SCORE:  {pont}\tTime:   {timer}");
             Console.WriteLine("-----------------------------------------------");
             for (int i = 0; i < matrix.GetLength(0); i++)
             {
@@ -248,6 +297,7 @@ namespace projekt
             Console.CursorVisible = false;
             Start();
             Feltoltes();
+            Multiplier();
             Jatek();
             
             Console.CursorVisible = true;
